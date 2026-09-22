@@ -1,0 +1,1334 @@
+@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@1,6..96,500&family=Chakra+Petch:wght@500;600;700&family=Courier+Prime:wght@400;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&family=Public+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  --void: #0b0a10;
+  --deep: #14121b;
+  --rule: #2a2733;
+  --dim: #7a7488;
+  --bone: #e6e1d7;
+  --amber: #e3b85c;      /* you, and what survived */
+  --lilac: #9e93c4;      /* elsewhere */
+  --faint: #4a4655;
+  --ghost: #332f3d;      /* a row that has nothing in it yet */
+
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  /* even in and out. --ease is an expo-out: it throws most of the movement into
+     the first third and crawls the rest, which reads as a snap, not a glide. */
+  --glide: cubic-bezier(0.65, 0, 0.35, 1);
+
+  --sans: 'IBM Plex Sans', system-ui, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, monospace;
+  /* the wordmark: squared terminals, reads like something stencilled on a door */
+  --wordmark: 'Chakra Petch', 'Public Sans', 'Helvetica Neue', Arial, sans-serif;
+  --display: 'Public Sans', 'Helvetica Neue', Arial, sans-serif;
+  --serif: 'Bodoni Moda', Georgia, serif;
+  /* the landing copy, set in the face the typewriter is imitating */
+  --body: 'Courier Prime', 'IBM Plex Mono', ui-monospace, monospace;
+
+  /* the intro mark, once it has finished shrinking */
+  --mark: clamp(50px, 5.4vw, 62px);
+  --ring: 30px; /* breathing room between the mark and its circle */
+
+  /* The measure the header bar and both onboarding columns are set to. One
+     number, so the brand mark starts on the same line as the first field label
+     and the step counter ends on the same line as the map's right edge. */
+  --shell: 64rem;
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; padding: 0; background: var(--void); }
+
+body {
+  color: var(--bone);
+  font-family: var(--sans);
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+}
+
+.stage {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 6vh 7vw;
+}
+
+/* ---------------------------------------------------------------- type */
+/* A plate on a building, not a book jacket. Caps, wide tracking, and the
+   tracking tightens as the size goes up — wide letterspacing that reads right
+   at 17px turns into a gappy mess at 46px. */
+.name {
+  font-family: var(--wordmark);
+  font-weight: 600;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin: 0;
+  font-size: clamp(1.05rem, 4.6vw, 2.9rem);
+}
+@media (min-width: 640px)  { .name { letter-spacing: 0.115em; } }
+@media (min-width: 1024px) { .name { letter-spacing: 0.088em; } }
+
+/* Section headings: same institutional face, set quietly. */
+.head {
+  font-family: var(--display);
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.004em;
+}
+
+/* Bodoni italic, and only here: the divergence line in Results. */
+.display {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 500;
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+}
+
+.mono { font-family: var(--mono); }
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.note {
+  color: var(--dim);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  max-width: 30rem;
+}
+
+/* ---------------------------------------------------------------- mark */
+.markring {
+  width: calc(var(--mark) + var(--ring));
+  height: calc(var(--mark) + var(--ring));
+  border: 1px solid var(--rule);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 1.6rem;
+}
+
+/* -------------------------------------------------------------- motion */
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pop  { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: none; } }
+/* `scale`, not `transform: scale()`. The thing this animates is centred on its
+   mark by a translate, and a transform here would replace that translate rather
+   than compose with it — which put the expanding ring half its own width down
+   and right of the dot it is supposed to be leaving from. */
+@keyframes ping { from { scale: 0.35; opacity: 0.85; } to { scale: 2.8; opacity: 0; } }
+@keyframes open { from { opacity: 0; transform: scale(0.965) translateY(10px); } to { opacity: 1; transform: none; } }
+/* the call to action, breathing once it has settled */
+/* the readout once the prime is fixed: it should look lit, not just relabelled */
+@keyframes lit {
+  0%, 100% { opacity: 0.72; text-shadow: none; }
+  50%      { opacity: 1; text-shadow: 0 0 12px color-mix(in srgb, var(--amber) 60%, transparent); }
+}
+
+@keyframes breathe {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--amber) 0%, transparent); }
+  50%      { box-shadow: 0 0 24px 3px color-mix(in srgb, var(--amber) 42%, transparent); }
+}
+
+.rise { animation: rise 900ms var(--ease) both; }
+.fade { animation: fade 700ms ease both; }
+.pop  { animation: pop 520ms var(--ease) both; }
+.open { animation: open 620ms var(--ease) both; }
+.breathe { animation: breathe 2600ms ease-in-out 700ms infinite; }
+.lit { color: var(--amber); animation: lit 2200ms ease-in-out infinite; }
+
+.seg {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: draw 1400ms var(--ease) forwards;
+}
+
+/* --------------------------------------------------------------- forms */
+.field {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  border-bottom: 1px solid var(--rule);
+  padding: 0.55rem 0;
+  transition: border-color 300ms ease;
+}
+/* Both halves of the row light, not just the rule under it: a single hairline
+   changing colour is not enough to find the active field at a glance. */
+.field:focus-within { border-color: var(--amber); }
+.field:focus-within label { color: var(--amber); }
+.field label {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--dim);
+  transition: color 300ms ease;
+  /* sized to the longest label in content.ts — a label that wraps breaks the
+     row rhythm of the entire form */
+  width: 8.5rem;
+  flex: none;
+}
+.field input {
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: 0;
+  outline: none;
+  color: var(--bone);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 300;
+  padding: 0.25rem 0;
+}
+.field input::placeholder { color: var(--faint); }
+
+/* Autofill. Chrome paints a field it has filled with its own near-white ground
+   and near-black text, which on this page is a lit rectangle sitting in the
+   middle of a dark form — and neither is reachable the usual way: the ground is
+   a UA style that outranks any author `background`, and the text ignores
+   `color`. So the ground is covered by an inset shadow, which paints above the
+   background and below the text, and the text is set through the one property
+   the UA style does respect. --void rather than transparent because an inset
+   shadow cannot be see-through; the page's gradient is never more than a few
+   percent off it under these fields, so the patch does not read as a panel.
+
+   Every input on the site is in here. The events ledger's are unlikely to be
+   offered a saved value, but a browser that decides otherwise should not be
+   able to punch a white hole in the register either. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--bone);
+  -webkit-box-shadow: inset 0 0 0 100px var(--void);
+  caret-color: var(--bone);
+}
+/* the year keeps its amber in the row being worked on, autofilled or not */
+.lrow:focus-within .lyear:-webkit-autofill { -webkit-text-fill-color: var(--amber); }
+
+/* Separate rule on purpose: one unrecognised selector invalidates the whole
+   list it is written in, so the standard spelling cannot share a block with the
+   prefixed one above. */
+input:autofill {
+  -webkit-text-fill-color: var(--bone);
+  box-shadow: inset 0 0 0 100px var(--void);
+  caret-color: var(--bone);
+}
+.lrow:focus-within .lyear:autofill { -webkit-text-fill-color: var(--amber); }
+
+/* ---------------------------------------------------------- onboarding */
+/* One ground across the whole width, and it is not decoration. Amber means you
+   and lilac means elsewhere everywhere else in the product, so the page states
+   the same thing under the columns: your answers on the warm side, the search
+   for your position on the cold side, neutral where the divider falls — which
+   is what stops that line reading as an arbitrary rule. It also means the map's
+   wash runs off into the page instead of stopping on a panel edge, so the
+   triangulation's container carries no fill of its own. */
+.onboard-stage {
+  /* the same frame the events screen is set in, so the header bar and the two
+     columns land on the same width across all five screens */
+  --shell: 96rem;
+  justify-content: flex-start;
+  padding: 0 clamp(1.25rem, 3.5vw, 4rem) clamp(2.5rem, 7vh, 5rem);
+  background:
+    linear-gradient(
+      100deg,
+      color-mix(in srgb, var(--amber) 7%, transparent) 0%,
+      color-mix(in srgb, var(--amber) 1.5%, transparent) 34%,
+      var(--void) 50%,
+      color-mix(in srgb, var(--lilac) 2%, transparent) 66%,
+      color-mix(in srgb, var(--lilac) 8%, transparent) 100%
+    ),
+    var(--void);
+}
+
+/* ------------------------------------------------------------- header bar */
+/* No rule under it. The gradient already separates the bar from the page, and a
+   border here would put a second line above a screen whose only other line is
+   the column divider. */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding-top: 1.9rem;
+}
+.topbar-mark { display: block; flex: none; }
+.topbar-name {
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: 0.625rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dim);
+  white-space: nowrap;
+}
+.topbar-step {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--faint);
+  white-space: nowrap;
+}
+
+.onboard {
+  display: grid;
+  /* The measure is the track, not a cap inside a wider one — that is what keeps
+     the space between the last field and the divider equal to the column gap
+     rather than however much of a proportional column the fields failed to
+     fill. Everything the frame has beyond the measure goes to the map. */
+  grid-template-columns: minmax(0, 30rem) minmax(0, 1fr);
+  column-gap: clamp(1.6rem, 4vw, 3.4rem);
+  width: 100%;
+  max-width: var(--shell);
+  /* Top-anchored rather than centred, and both columns start on the same line.
+     Centring a short column in a tall viewport is what produced the dead space
+     above and below, and it got worse the bigger the monitor. Capped at the top
+     end so a very tall screen does not simply move the void up here. */
+  margin: clamp(1.5rem, 14vh, 8.5rem) auto 0;
+}
+.onboard-body {
+  grid-column: 1;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+}
+/* Back / the note / Next belong to the form, not to the last field in it, and
+   the sections are 3, 4 and 5 fields long — so following the fields moved that
+   row 167px between steps, which is most of the height of the form. The map
+   already sets the height of the row and this column already stretches to it;
+   all that was missing was something to take up the slack. Grow, never shrink:
+   on a short screen the map gives up height first, and the fields must not then
+   be squeezed to keep the row at the bottom. */
+.onboard-fields { flex: 1 0 auto; }
+.onboard-side {
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-left: 1px solid var(--rule);
+  padding-left: clamp(1.4rem, 3vw, 2.8rem);
+}
+
+
+.imp-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.1rem;
+}
+.imp-count,
+.tri-count {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--amber);
+  white-space: nowrap;
+}
+.tri-caption {
+  font-family: var(--mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin: 0.9rem 0 0;
+}
+.imp-figure {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* The label, the readout, the caption and the note reach the track's edges and
+   the drawing floats inside them — the same arrangement the timeline column
+   uses on the events screen, where the chart is narrower than its column too.
+   Height is what bounds the map: it is square, so left to the track's width on
+   this frame it would ask for a page taller than the screen. */
+.imp-figure > svg { width: 100%; height: auto; max-height: min(58vh, 620px); }
+.imp-note { margin-top: 1rem; font-size: 0.75rem; line-height: 1.5; color: var(--faint); }
+
+/* Everything but the map clears out as the map departs. */
+.onboard-body,
+.imp-head,
+.tri-caption,
+.imp-note { transition: opacity 320ms ease; }
+.onboard.is-leaving .onboard-body,
+.onboard.is-leaving .imp-head,
+.onboard.is-leaving .tri-caption,
+.onboard.is-leaving .imp-note { opacity: 0; }
+.onboard-side { transition: border-color 320ms ease; }
+.onboard.is-leaving .onboard-side {
+  border-left-color: transparent;
+  border-top-color: transparent; /* the divider is a top border below 900px */
+}
+
+/* The lock: the map comes to the middle of the screen on its own. */
+.locked-wrap {
+  max-width: 46rem;
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+/* Explicit and flex:none. As a shrinkable flex item with only a max-width it
+   was being squeezed below the column's own 500px height cap, so the map got
+   *smaller* on the way to the middle instead of larger. */
+.lock-fig {
+  flex: none;
+  /* 92vw is load-bearing: the other two terms are height-based, so on a tall
+     narrow phone this resolved to 594px and pushed the whole screen sideways */
+  width: min(42rem, 66vh, 92vw);
+  will-change: transform;
+}
+.lock-fig > svg { display: block; width: 100%; height: auto; }
+
+.lock-title {
+  font-family: var(--mono);
+  font-size: clamp(1.05rem, 2.6vw, 1.5rem);
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin: 0 0 0.5rem;
+}
+.lock-title.lit { color: var(--amber); }
+/* a phrase, not a number: it has to be allowed to wrap, which .tri-count is not */
+.lock-sub {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.16em;
+  line-height: 1.7;
+  text-transform: uppercase;
+  color: var(--dim);
+  max-width: 26rem;
+  margin: 0 auto;
+  text-wrap: balance; /* otherwise "MAP" orphans onto its own line on a phone */
+}
+/* The bar takes the top of the column and the fix centres in whatever is left:
+   auto on all four sides, rather than a centred column pushed down by the bar. */
+.lock-stage {
+  justify-content: flex-start;
+  /* the map is already the tallest thing on any screen; with the bar above it
+     the questionnaire's 10vh tail is what tips it into a scroll */
+  padding-bottom: 4vh;
+}
+.lock-stage .locked-wrap { margin: auto; }
+.locked-wrap .imp-head { justify-content: center; gap: 1.4rem; width: 100%; margin-bottom: 0.9rem; }
+.locked-wrap .tri-caption { margin-top: 0.6rem; }
+
+/* Narrow: one column, the form first and the map under it. The gradient turns
+   vertical to match — amber at the top where the answers are, lilac at the
+   bottom where the search is — so the reading survives the reflow. */
+@media (max-width: 900px) {
+  .onboard-stage {
+    background:
+      linear-gradient(
+        190deg,
+        color-mix(in srgb, var(--amber) 7%, transparent) 0%,
+        color-mix(in srgb, var(--amber) 1.5%, transparent) 34%,
+        var(--void) 50%,
+        color-mix(in srgb, var(--lilac) 2%, transparent) 66%,
+        color-mix(in srgb, var(--lilac) 8%, transparent) 100%
+      ),
+      var(--void);
+  }
+  .onboard {
+    grid-template-columns: minmax(0, 1fr);
+    column-gap: 0;
+    max-width: none;
+    margin-top: clamp(1.2rem, 6vh, 3rem);
+  }
+  .onboard-body { grid-column: 1; grid-row: 1; }
+  /* the divider becomes the horizontal rule between the two, so the columns
+     stay separated by the same one line they are on a wide screen */
+  .onboard-side {
+    grid-column: 1;
+    grid-row: 2;
+    border-left: 0;
+    border-top: 1px solid var(--rule);
+    padding-left: 0;
+    padding-top: 1.6rem;
+    margin-top: 2.6rem;
+  }
+  .imp-head { flex-wrap: wrap; }
+  /* the map is the whole width of a phone otherwise, which is more of it than
+     the questions above deserve to give up */
+  .imp-figure { flex: none; width: 100%; max-width: 28rem; margin: 0 auto; }
+  .imp-figure > svg { max-height: none; }
+}
+
+@media (max-width: 430px) {
+  .tri-caption { letter-spacing: 0.14em; }
+}
+
+@media (max-width: 480px) {
+  .field label { width: 7rem; font-size: 0.625rem; letter-spacing: 0.09em; }
+  .field { gap: 0.7rem; }
+}
+
+/* ------------------------------------------------------------ events form */
+/* Two inputs on one line are a guessing game unless the columns are named and
+   the rows are numbered, so both are stated rather than inferred. */
+.ledger { margin: 0 -0.6rem 1rem; }
+.lhead,
+.lrow {
+  display: grid;
+  grid-template-columns: 2rem 4.4rem minmax(0, 1fr);
+  gap: 0.9rem;
+  padding: 0 0.6rem;
+}
+.lhead {
+  align-items: center;
+  font-family: var(--mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--faint);
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid var(--rule);
+}
+/* The fields stretch to the row rather than sitting on its middle line. An
+   <input> centres its own value, so a row that has grown to fill the column
+   still reads centred — and the focused field's underline lands on the row's
+   own rule instead of floating somewhere inside it. */
+.lrow {
+  align-items: stretch;
+  border-bottom: 1px solid var(--rule);
+}
+/* Nothing marks the row in the gutter. The index going amber, the year going
+   amber with it and the focused field underlining itself are already three
+   statements of which row is being worked on; a bar beside them was a fourth. */
+
+/* three states, darkest to brightest: nothing in it, something in it, in it now */
+.lidx {
+  display: flex;
+  align-items: center;
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  color: var(--ghost);
+  transition: color 340ms ease;
+}
+.lrow.on .lidx { color: var(--faint); }
+.lrow:focus-within .lidx { color: var(--amber); }
+
+.lyear,
+.ltext {
+  min-width: 0;
+  background: none;
+  border: 0;
+  /* laid over the row's own rule by that -1px, so the focused field underlines
+     itself instead of putting a second line under the row */
+  border-bottom: 1px solid transparent;
+  margin-bottom: -1px;
+  outline: none;
+  padding: 0.95rem 0;
+  transition: border-color 260ms ease, color 340ms ease;
+}
+.lyear:focus,
+.ltext:focus { border-bottom-color: var(--amber); }
+/* mono for the year, sans for the sentence: the faces say which is which
+   before the placeholder gets a chance to */
+.lyear {
+  font-family: var(--mono);
+  font-size: 0.84375rem;
+  letter-spacing: 0.08em;
+  color: var(--bone);
+}
+/* Year and description agree: what was typed is --bone and what is only being
+   asked for is --faint, in both columns. Amber is not the colour of an answer
+   here — it is reserved for the row being worked on, which is the one thing the
+   marker bar and the index are also saying. */
+.lrow:focus-within .lyear { color: var(--amber); }
+/* --faint like every other placeholder on the screen: --ghost is the colour of
+   a row with nothing in it, not of a prompt asking for something */
+.lyear::placeholder { color: var(--faint); letter-spacing: 0.16em; }
+.ltext {
+  font-family: var(--sans);
+  font-weight: 300;
+  font-size: 0.90625rem;
+  color: var(--bone);
+}
+.ltext::placeholder { color: var(--faint); }
+
+/* One row on one baseline: the note, then the controls. It used to be a gap, a
+   button, another gap and a note floating under it — three elements and three
+   gaps to say one thing. The body no longer reserves the tallest section's
+   height either, so the row follows the last field instead of being pushed to
+   the bottom of a box with nothing in it. */
+.foot {
+  display: flex;
+  align-items: baseline;
+  /* nowrap, so a long note shrinks and takes a second line *inside* the row
+     rather than breaking the row in two — which is the thing this replaced */
+  flex-wrap: nowrap;
+  gap: 1.2rem;
+  margin-top: 2.4rem;
+}
+.foot .btn { flex: none; }
+.foot-note {
+  margin: 0;
+  /* shrinkable, so on the events screen — where the recorded count shares the
+     row — the sentence takes a second line rather than pushing the controls
+     onto one */
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 21rem;
+  /* 10.5px: quieter than a field label, still a sentence rather than a caption */
+  font-size: 0.65625rem;
+  line-height: 1.6;
+  color: var(--dim);
+}
+.foot-go { display: flex; flex: none; align-items: baseline; gap: 1.2rem; margin-left: auto; }
+
+/* The note cannot share a line with Back and Next at this width, so it takes
+   the line above them rather than being squeezed or wrapped to three. */
+@media (max-width: 560px) {
+  .foot { flex-wrap: wrap; row-gap: 0.9rem; }
+  .foot-note { order: -1; flex: 1 0 100%; max-width: none; }
+}
+
+@media (max-width: 480px) {
+  .lhead, .lrow { grid-template-columns: 1.6rem 3.6rem minmax(0, 1fr); gap: 0.6rem; }
+  .lyear, .ltext { padding: 0.72rem 0; }
+}
+
+/* ------------------------------------------------- the canon events screen */
+/* The fifth screen is the only one with a chart beside it rather than a map,
+   and the chart is a tall 344x472 figure — so it gets a frame of its own rather
+   than the 64rem measure the four profile screens share. At 64rem the ledger's
+   five rows were holding a third of a 1920px display and the remaining two
+   thirds were ground. --shell is redeclared rather than overridden per element,
+   so the header bar and the columns stay on one measure the way they do
+   everywhere else.
+
+   Same gradient as the questionnaire, run across the wider frame: amber for the
+   answers on the left, lilac for the branching on the right, neutral in the
+   middle where the two columns meet. */
+.events-stage {
+  --shell: 96rem;
+  justify-content: flex-start;
+  padding: 0 clamp(1.25rem, 3.5vw, 4rem) clamp(2.5rem, 7vh, 5rem);
+  background:
+    linear-gradient(
+      100deg,
+      color-mix(in srgb, var(--amber) 7.5%, transparent) 0%,
+      color-mix(in srgb, var(--amber) 1.8%, transparent) 32%,
+      var(--void) 50%,
+      color-mix(in srgb, var(--lilac) 2.2%, transparent) 66%,
+      color-mix(in srgb, var(--lilac) 8.5%, transparent) 100%
+    ),
+    var(--void);
+}
+
+/* No divider between the columns. The 56px gap and the gradient turning over
+   from warm to cold between them is the separation; a rule on top of that was a
+   third statement of the same thing. */
+.events {
+  display: grid;
+  grid-template-columns: minmax(0, 1.32fr) minmax(0, 1fr);
+  gap: 56px;
+  /* the default, stated, because it is what matches the two columns: the chart
+     is the taller of the two, so the row it asks for is the height the ledger
+     is then stretched to. Never the other way round — the chart is *placed*
+     here, not sized here. */
+  align-items: stretch;
+  width: 100%;
+  max-width: var(--shell);
+  margin: clamp(1.4rem, 5vh, 3.2rem) auto 0;
+}
+.evt-body,
+.evt-side {
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.evt-body { grid-column: 1; }
+.evt-side {
+  grid-column: 2;
+  /* the page gradient is the only fill on this side: a panel here would stop
+     the lilac wash on an edge instead of letting it run off the page */
+  background: none;
+  border: 0;
+}
+/* grow into whatever the row turns out to be, never shrink below the figure:
+   the chart keeps its own height and simply sits at the top of the space */
+.evt-figure { flex: 1 0 auto; }
+
+.evt-note { margin: 0 0 1.75rem; max-width: 38rem; }
+
+/* The ledger takes up the slack. The column is as tall as the chart, so without
+   this the five rows stack under the note and the ledger stops halfway down a
+   column that ends level with the figure. Rows grow and never shrink, so the
+   padding on the fields above is what a row is worth at its smallest — which is
+   what it is under 900px, where the matched height is dropped. */
+.events .ledger {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+.events .lrow { flex: 1 0 auto; }
+
+/* Back, the count and the note on one line, and nothing else on it: the sweep
+   is no longer part of the form, so the form's footer only reports the form. */
+.evt-foot {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.8rem 1.5rem;
+  margin-top: 1.6rem;
+}
+.evt-foot .btn { flex: none; }
+.evt-foot .caption { flex: none; white-space: nowrap; }
+
+/* The sweep ends the screen rather than the form, so it is centred under the
+   pair of columns it acts on. */
+.evt-run {
+  display: flex;
+  justify-content: center;
+  margin-top: clamp(2.2rem, 5.5vh, 3.4rem);
+}
+
+/* One column, the ledger first and the chart under it. The gradient turns with
+   the layout — amber at the top where the answers are, lilac at the bottom
+   where the branching is — so the reading survives the reflow. The matched
+   height is dropped: each section takes the height it needs. */
+@media (max-width: 900px) {
+  .events-stage {
+    background:
+      linear-gradient(
+        190deg,
+        color-mix(in srgb, var(--amber) 7.5%, transparent) 0%,
+        color-mix(in srgb, var(--amber) 1.8%, transparent) 32%,
+        var(--void) 50%,
+        color-mix(in srgb, var(--lilac) 2.2%, transparent) 66%,
+        color-mix(in srgb, var(--lilac) 8.5%, transparent) 100%
+      ),
+      var(--void);
+  }
+  .events {
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(2rem, 5vw, 3rem);
+    margin-top: clamp(1.2rem, 4vh, 2.2rem);
+  }
+  .evt-side { grid-column: 1; grid-row: 2; }
+  .events .ledger,
+  .events .lrow,
+  .evt-figure { flex: none; }
+  /* the chart is the whole width of a phone otherwise, which is more of it than
+     the ledger above deserves to give up */
+  .evt-figure { width: 100%; max-width: 26rem; margin: 0 auto; }
+}
+
+/* The note takes the line under Back and the count rather than being squeezed
+   in beside them — but it stays last, because it is the least of the three. */
+@media (max-width: 560px) {
+  .evt-foot .foot-note { order: 0; flex: 1 0 100%; max-width: none; }
+}
+
+/* -------------------------------------------------------- divergence chart */
+.tree { display: block; width: 100%; height: auto; max-height: min(74vh, 620px); }
+.glyph { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; }
+
+/* a new segment draws itself in; one already on screen is never remounted, so
+   it never redraws */
+.grow {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: draw 700ms var(--ease) both;
+  /* the shape rides on the `d` property rather than the attribute so it can be
+     transitioned: the branch for the row being typed eases to its new angle
+     instead of jumping. Where `d` is not animatable the attribute still
+     renders it — it just arrives at once. */
+  transition: d 520ms var(--glide);
+}
+.node {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pop 520ms var(--ease) both;
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* -------------------------------------------------------------- buttons */
+.btn {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  background: none;
+  cursor: pointer;
+  border: 1px solid var(--rule);
+  color: var(--bone);
+  padding: 0.95rem 2.4rem;
+  transition: border-color 400ms ease, color 400ms ease, background 400ms ease,
+    box-shadow 400ms ease;
+}
+.btn:hover { border-color: var(--amber); color: var(--amber); }
+.btn:focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; }
+.btn.solid { background: var(--bone); color: var(--void); border-color: var(--bone); }
+.btn.solid:hover { background: var(--amber); border-color: var(--amber); color: var(--void); }
+.btn.solid:disabled { background: var(--rule); border-color: var(--rule); color: var(--dim); cursor: default; }
+.btn.ghost { border-color: transparent; color: var(--dim); padding-left: 0; padding-right: 1.2rem; }
+.btn.ghost:hover { color: var(--bone); }
+
+/* The sweep. Lit the way Begin is lit: a thin ring on the edge and then two
+   wider washes, so the light falls off into the page instead of ending on a
+   line. Three layers rather than one because a single large shadow reads as a
+   grey box behind the button — the ring is what makes it look like the button
+   itself is the source. */
+.btn.sweep {
+  font-size: 0.59375rem;
+  letter-spacing: 0.24em;
+  padding: 1.1rem 3rem;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--amber) 35%, transparent),
+    0 0 28px 2px color-mix(in srgb, var(--amber) 22%, transparent),
+    0 0 64px 8px color-mix(in srgb, var(--amber) 10%, transparent);
+}
+/* Gone entirely, not dimmed. A button that glows and cannot be pressed reads as
+   broken rather than as unavailable, and the count and note beside Back have
+   already said why it is not available yet. */
+.btn.sweep:disabled { box-shadow: none; }
+
+/* ---------------------------------------------------------------- sweep */
+/* Centring is done with the independent `translate` property throughout, so an
+   animation is free to take `scale` without knocking the mark off its point.
+   Everything in here stacks on one spot — dot, ring and ping share a centre —
+   and that only holds while the two are kept in separate properties. */
+.lockmark { position: absolute; translate: -50% -50%; }
+.lockmark span { position: absolute; left: 50%; top: 50%; translate: -50% -50%; }
+.lockmark .ping {
+  width: 22px; height: 22px; border-radius: 50%; border: 1px solid;
+  animation: ping 1800ms ease-out infinite;
+}
+.lockmark .ring { width: 20px; height: 20px; border-radius: 50%; border: 1px solid; opacity: 0.45; }
+.lockmark .dot { width: 5px; height: 5px; border-radius: 50%; }
+/* the one thing that is not centred on the mark: it sits beside it, so it takes
+   the vertical half of the centring and none of the horizontal */
+.lockmark .label {
+  left: 26px;
+  translate: 0 -50%;
+  white-space: nowrap;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+}
+
+/* The one heading on the results screen, set in the wordmark's face. It is the
+   other bookend to the landing, and the display sans read as body copy at this
+   size. Tracking tightens as the size grows, the same way .name does — wide
+   letterspacing that is right at 18px is a gappy mess at 32px. */
+.found {
+  font-family: var(--wordmark);
+  font-weight: 600;
+  font-size: clamp(1.15rem, 3vw, 2rem);
+  line-height: 1.25;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: center;
+  text-wrap: balance;
+  margin: 0 0 2.8rem;
+}
+@media (min-width: 640px)  { .found { letter-spacing: 0.085em; } }
+@media (min-width: 1024px) { .found { letter-spacing: 0.07em; } }
+
+/* ---------------------------------------------------------------- cards */
+/* Three equal columns that share the whole row, collapsing to two and then one.
+   auto-fit was laying out more tracks than there are cards on a wide screen and
+   leaving the set huddled at one end. */
+.cards {
+  display: grid;
+  gap: clamp(1rem, 1.8vw, 1.8rem);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+@media (max-width: 900px) { .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 620px) { .cards { grid-template-columns: minmax(0, 1fr); } }
+.card {
+  text-align: left;
+  background: var(--deep);
+  border: 1px solid var(--rule);
+  padding: clamp(1.6rem, 2.2vw, 2.2rem) clamp(1.4rem, 2vw, 2rem) clamp(1.5rem, 2vw, 2rem);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: transform 500ms var(--ease), border-color 400ms ease;
+}
+.card::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 2px;
+  background: var(--acc);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 600ms var(--ease);
+}
+.card:hover { transform: translateY(-4px); border-color: var(--acc); }
+.card:hover::after { transform: scaleX(1); }
+.card:focus-visible { outline: 2px solid var(--acc); outline-offset: 3px; }
+.card-now {
+  color: #cfc9be;
+  font-size: clamp(0.9375rem, 1.15vw, 1.0625rem);
+  line-height: 1.65;
+  margin: 0;
+}
+.card h3 {
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: clamp(1.9rem, 2.6vw, 2.4rem);
+  letter-spacing: -0.015em;
+  margin: 0.5rem 0 0.9rem;
+  color: var(--bone);
+}
+
+/* ------------------------------------------------------- the reading page */
+/* A soft field in the variant's own accent, and nothing else: the same tint the
+   card carries, so a card and its page read as one object. Typeface, grid and
+   spacing are identical across all three lives — the colour is the only thing
+   that differs, which is what lets each variant have its own atmosphere without
+   its own design. */
+.read {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background:
+    radial-gradient(
+      90% 70% at 88% 0%,
+      color-mix(in srgb, var(--acc) 10%, transparent) 0%,
+      color-mix(in srgb, var(--acc) 2%, transparent) 40%,
+      var(--void) 72%
+    );
+}
+.readpage {
+  max-width: 84rem;
+  width: 100%;
+  margin: 0 auto;
+  /* Stated, because .stage's own 7vw is wrong here. That padding is a share of
+     the viewport, which is breathing room when the box it pads is the viewport
+     — and a bite out of the measure when the box stops at a fixed width. At
+     1920 it was taking 268px out of a 992px shell and leaving the prose in a
+     360px column, and it got worse the wider the screen. A clamp holds it to
+     real room instead: it stops growing once the shell has stopped growing. */
+  padding-left: clamp(1.5rem, 5vw, 4rem);
+  padding-right: clamp(1.5rem, 5vw, 4rem);
+  padding-top: 8vh;
+  padding-bottom: 10vh;
+  justify-content: flex-start;
+}
+
+.read-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+.read-earth {
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: clamp(2rem, 5.5vw, 3.2rem);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  margin: 0.5rem 0 0;
+}
+.read-meta {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
+  text-align: right;
+  white-space: nowrap;
+}
+.read-meta .dot { padding: 0 0.15em; }
+/* drawn rather than typed: block glyphs are not in every mono face, and a
+   fallback would change the width of the readout */
+.bars { display: inline-flex; gap: 2px; vertical-align: -1px; margin-left: 0.5em; }
+.bars i { width: 6px; height: 10px; background: var(--rule); }
+.bars i[data-on='true'] { background: var(--dim); }
+
+/* the only italic display type on the page */
+.read-div {
+  font-size: 15px;
+  line-height: 1.5;
+  max-width: 28em;
+  color: var(--bone);
+  margin: 1.6rem 0 2.8rem;
+}
+
+.read-grid {
+  display: grid;
+  /* The rail holds two facing columns now, not one list, so it needs real width
+     — at 1.8fr the two timelines were about 190px each and every value broke
+     across three lines. The prose is capped at 38rem either way, so what it
+     gives up here is slack it was not using. */
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: clamp(1.8rem, 4vw, 3.2rem);
+  align-items: start;
+}
+/* The rule hangs off the prose, not off the rail. On the rail it is only as
+   long as the rail's own content, which leaves a short stub beside a long
+   column; on the prose it runs the full height of the page's tallest element. */
+.read-grid > :first-child { border-right: 1px solid var(--rule); padding-right: clamp(1.8rem, 4vw, 3.2rem); }
+
+.rail {
+  position: sticky;
+  top: 6vh;
+  display: flex;
+  flex-direction: column;
+  gap: 1.7rem;
+}
+.rail-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin: 0 0 0.7rem;
+}
+.rail-list { margin: 0; padding: 0; list-style: none; }
+.rail-list li {
+  font-family: var(--sans);
+  font-weight: 300;
+  font-size: 13.5px;
+  line-height: 1.7;
+}
+/* the payload, and the brightest thing in the rail */
+.rail-list.is-same li { color: #ded8cd; }
+.rail-both { border-top: 1px solid var(--rule); padding-top: 1.7rem; }
+
+/* The two timelines, set against each other. One row per dimension, so the flat
+   here sits on the same line as the flat there and the reader's eye crosses
+   between them instead of scrolling down to find the other half.
+   table-layout: fixed because the columns must stay equal — let them size to
+   their content and the longer answer takes the frame, which reads as the more
+   important one. */
+.rail-pair {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  text-align: left;
+}
+.rail-pair th {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  vertical-align: bottom;
+  padding: 0 0 0.8rem;
+}
+.rail-pair td {
+  font-family: var(--sans);
+  font-weight: 300;
+  font-size: 13.5px;
+  line-height: 1.6;
+  vertical-align: top;
+  padding: 0.75rem 0;
+  border-top: 1px solid var(--rule);
+}
+/* the gutter, and the line down it: the one rule on this page that is there to
+   say two things are being held apart rather than to end a section */
+.rail-pair th:first-child,
+.rail-pair td:first-child { padding-right: 1.1rem; }
+.rail-pair th:last-child,
+.rail-pair td:last-child { padding-left: 1.1rem; border-left: 1px solid var(--rule); }
+.rail-pair td.is-here { color: #d6d0c6; }
+/* dimmer on purpose: the reader's life is the reference point here, not the
+   subject */
+.rail-pair td.is-yours { color: #8e8779; }
+
+/* two columns of this at a phone's width is about nineteen characters a line;
+   the pairing is worth more than the extra point of size */
+@media (max-width: 480px) {
+  .rail-pair td, .rail-list li { font-size: 12.5px; }
+  .rail-pair th:first-child, .rail-pair td:first-child { padding-right: 0.7rem; }
+  .rail-pair th:last-child, .rail-pair td:last-child { padding-left: 0.7rem; }
+}
+
+.read-foot {
+  border-top: 1px solid var(--rule);
+  margin-top: 4rem;
+  padding-top: 1.4rem;
+}
+.read-foot .btn { padding-top: 0; padding-bottom: 0; }
+
+/* One column. The rail drops below the prose and stops holding position, but
+   the order does not change — the build to the payload is the point, and it has
+   to read the same on a phone as it does on a desktop. */
+@media (max-width: 900px) {
+  .read-grid { grid-template-columns: minmax(0, 1fr); }
+  .read-grid > :first-child { border-right: 0; padding-right: 0; }
+  .rail {
+    position: static;
+    border-top: 1px solid var(--rule);
+    padding-top: 2rem;
+    margin-top: 1rem;
+  }
+}
+@media (max-width: 480px) {
+  .read-head { align-items: flex-start; }
+  .read-meta { text-align: left; white-space: normal; }
+}
+
+/* --------------------------------------------------------------- a life */
+.life p {
+  font-size: 1.0625rem;
+  line-height: 1.72;
+  margin: 0 0 1.15rem;
+  color: #cfc9be;
+  /* ~80 characters at this size: the top of what is comfortable, and the point
+     past which a wider shell stops being worth having */
+  max-width: 38rem;
+}
+
+.toggle { display: inline-flex; border: 1px solid var(--rule); }
+.toggle button {
+  font-family: var(--mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 0.5rem 1rem;
+  background: none;
+  border: 0;
+  color: var(--dim);
+  cursor: pointer;
+  transition: color 300ms ease, background 300ms ease;
+}
+.toggle button[data-on='true'] { color: var(--void); background: var(--bone); }
+
+.notes { margin: 0; padding: 0; max-width: 38rem; }
+.notes li {
+  list-style: none;
+  position: relative;
+  padding: 0.55rem 0 0.55rem 1.2rem;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: #cfc9be;
+  border-bottom: 1px solid #1c1a24;
+}
+.notes li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 1.1rem;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--acc);
+}
+
+.year-label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; }
+.caption {
+  font-family: var(--mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.err {
+  border: 1px solid #8c4a3f;
+  color: #d98b74;
+  padding: 0.9rem 1.1rem;
+  font-size: 0.9375rem;
+  max-width: 34rem;
+}
+
+/* ----------------------------------------------------------- the register */
+/* The landing's ground: the Bureau's index of worlds, seen from far enough away
+   that it is texture rather than a list. It sits behind the whole composition
+   and is never the thing being read — the vignette over it is very nearly solid
+   --void exactly where the wordmark falls, so the wall is only ever allowed to
+   show at the edges of the frame. If it ever competes with the wordmark the
+   answer is a deeper vignette, not a dimmer wall: dimming it far enough to be
+   safe under the name leaves nothing at the edges either. */
+.reg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+}
+.reg.on { opacity: 1; }
+
+.reg-wall {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  /* the columns are several times the height of the frame and are meant to run
+     past it; start rather than stretch, and .reg clips what hangs over */
+  align-items: start;
+}
+
+.reg-col {
+  display: block;
+  text-align: center;
+  white-space: nowrap;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+/* nothing moves until the intro says it has landed */
+.reg.on .reg-col { animation-name: reg-roll; }
+/* the same loop read backwards, so half the archive scans the other way */
+.reg-col.dn { animation-direction: reverse; }
+
+/* Two identical units stacked, so the hand-off at -50% is onto the very line it
+   just left and there is no seam to catch. */
+@keyframes reg-roll {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-50%); }
+}
+
+.reg-e,
+.reg-claim {
+  display: block;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  line-height: 2.9;
+  color: var(--lilac);
+}
+/* the surfacing, and the only thing that carries it: one entry's opacity is
+   written straight to the node and this is what makes it a rise rather than a
+   flick */
+.reg-e { transition: opacity 900ms ease; }
+/* one world is already someone's. It holds at full amber and takes no part in
+   the surfacing — it is not being searched for, it has been found. */
+.reg-claim { color: var(--amber); }
+
+.reg-mask {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      54% 46% at 50% 50%,
+      color-mix(in srgb, var(--void) 97%, transparent),
+      color-mix(in srgb, var(--void) 86%, transparent) 56%,
+      color-mix(in srgb, var(--void) 40%, transparent) 80%,
+      transparent
+    ),
+    linear-gradient(var(--void), transparent 18%, transparent 82%, var(--void));
+}
+
+/* Fewer columns rather than narrower ones: at a phone's width ten tracks put
+   about four characters on a line and the entries stop reading as designations
+   at all. */
+@media (max-width: 900px) {
+  .reg-wall { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .reg-col:nth-child(n + 7) { display: none; }
+}
+@media (max-width: 560px) {
+  .reg-wall { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .reg-col:nth-child(n + 5) { display: none; }
+}
+/* One more step down. A designation is ~86px at this size and the frame has
+   340px of usable width at 380px, so the fourth track is the one that stops
+   fitting — and an entry wider than its column does not wrap, it runs into its
+   neighbour. */
+@media (max-width: 440px) {
+  .reg-wall { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .reg-col:nth-child(n + 4) { display: none; }
+}
+
+/* -------------------------------------------------------------- the count */
+/* A mechanical dial, not a number being replaced. Each place is a window one
+   digit high onto a strip of all ten, so a place that has not changed does not
+   move at all — which is the whole effect: the ones spin continuously and the
+   millions have not turned since the door opened. */
+/* No height of its own. The count hangs in the 1.6rem the wordmark already had
+   above it, so the mark, the wordmark, the copy and the button all stay exactly
+   where they were — and, more to the point, so does the slot the intro measures
+   once to aim the dock at. */
+.reg-slot { position: relative; height: 0; }
+.reg-count {
+  --dh: 1.8em; /* the window, and the strip's step: one line-height */
+  position: absolute;
+  left: 50%;
+  bottom: 0.35rem;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8em;
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 8px;
+  line-height: 1.8;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+.reg-num { display: inline-flex; align-items: center; }
+/* fixed cells: a 9 turning over into a 0 must not be able to move the millions
+   sideways, and tabular figures alone do not stop that once the tracking is on */
+.reg-d {
+  display: block;
+  width: 0.9em;
+  height: var(--dh);
+  overflow: hidden;
+}
+/* the same cell as a digit: mono advances are all equal, and it also means the
+   line is exactly as wide before the dial is built as after */
+.reg-sep { display: block; width: 0.9em; text-align: center; letter-spacing: normal; }
+.reg-strip { display: block; transition: transform 420ms var(--ease); }
+.reg-strip b {
+  display: block;
+  height: var(--dh);
+  line-height: var(--dh);
+  font-weight: inherit;
+  text-align: center;
+  /* the cell above supplies the tracking; inside it the glyph is centred */
+  letter-spacing: normal;
+}
+.reg-label { white-space: nowrap; }
+
+@media (prefers-reduced-motion: reduce) {
+  .seg { animation-duration: 1ms; stroke-dashoffset: 0; }
+  /* the chart renders its final state directly: no draw-in, no scale, no wait */
+  .grow { animation-duration: 1ms; stroke-dashoffset: 0; }
+  .grow, .node, .tree .fade { animation-delay: 0s !important; }
+  .grow { transition-duration: 1ms; }
+  .rise, .fade, .pop, .open { animation-duration: 1ms; }
+  .lockmark .ping { animation: none; opacity: 0; }
+  .breathe, .lit { animation: none; }
+  /* the rail arrives with the page rather than after it */
+  .rail { animation: none; opacity: 1; }
+  /* the intro goes straight to its final state: mark docked, no growth, no shrink */
+  .markwrap, .markwrap *, .introtext, .introtext * { transition-duration: 1ms !important; }
+  /* the register becomes a printed page: it is still there, still at its own
+     opacities, but nothing scans, surfaces or turns over */
+  .reg-col { animation: none; }
+  .reg-e, .reg-strip { transition: none; }
+}
